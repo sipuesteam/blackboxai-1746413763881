@@ -1,0 +1,21 @@
+{
+  "name": "Hygiene & Cleaning Products Store",
+  "short_name": "HygieneStore",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#4f46e5",
+  "description": "A Progressive Web App for Amazon affiliate hygiene and cleaning products.",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/888/888879.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/888/888879.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
