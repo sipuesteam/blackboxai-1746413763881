@@ -1,0 +1,106 @@
+// This is the application level build.gradle file where you can add configuration settings common to all modules.
+
+plugins {
+    // Apply the Android Application plugin to build a standard Android app.
+    id 'com.android.application'
+    // Apply the Kotlin Android plugin for Kotlin support.
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    // compileSdk specifies the Android API level to compile your app against.
+    // Using a recent stable version is recommended to access the latest features and APIs.
+    compileSdk 34 // Updated to a more recent stable API level
+
+    // defaultConfig block applies to all build variants unless overridden.
+    defaultConfig {
+        // applicationId is the unique identifier for your application package.
+        applicationId "com.example.hygienestore" // Keep your existing package name
+        // minSdk specifies the minimum API level required to run your app.
+        minSdk 24 // Updated minSdk to 24 (Android 7.0 Nougat) for broader compatibility with modern libraries and features, while still supporting a significant user base. Adjust if you need to support older devices.
+        // targetSdk specifies the API level your app is designed to run on.
+        // It should generally be set to the latest stable API level to ensure your app behaves correctly on the newest Android versions.
+        targetSdk 34 // Updated to match compileSdk
+
+        // versionCode is an integer value that represents the version of the application code.
+        versionCode 1
+        // versionName is a string value that represents the user-visible version of the application.
+        versionName "1.0"
+
+        // testInstrumentationRunner specifies the test runner to use for instrumented tests.
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    // buildTypes block configures different build types (e.g., debug, release).
+    buildTypes {
+        release {
+            // minifyEnabled enables code shrinking, obfuscation, and optimization for the release build.
+            minifyEnabled false // Set to true for production releases to reduce APK size and obfuscate code.
+            // proguardFiles specifies ProGuard or R8 rule files to apply.
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    // compileOptions block configures Java compilation options.
+    compileOptions {
+        // Set source and target compatibility to Java 1.8, which is commonly used and compatible with Kotlin.
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    // kotlinOptions block configures Kotlin compilation options.
+    kotlinOptions {
+        // Set the JVM target version for Kotlin compilation.
+        jvmTarget = '1.8'
+    }
+
+    // Optional: View Binding configuration (recommended for easier view interaction)
+    // If you want to use View Binding, uncomment the block below.
+    /*
+    buildFeatures {
+        viewBinding true
+    }
+    */
+}
+
+dependencies {
+    // Core Kotlin standard library
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.0" // Updated Kotlin standard library version for compatibility
+    // Core KTX (Kotlin Extensions) - provides convenient Kotlin extensions for Android development
+    implementation 'androidx.core:core-ktx:1.12.0' // Updated to a more recent stable version
+    // AppCompat - provides backward compatibility for newer Android features
+    implementation 'androidx.appcompat:appcompat:1.6.1' // Keep current stable version
+    // Material Components - provides Material Design UI components
+    implementation 'com.google.android.material:material:1.10.0' // Updated to a more recent stable version
+    // ConstraintLayout - allows flexible UI layout
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4' // Keep current stable version
+    // RecyclerView - for displaying lists efficiently
+    implementation 'androidx.recyclerview:recyclerview:1.3.2' // Updated to a more recent stable version
+
+    // Networking Library: OkHttp (already included)
+    // A popular library for making HTTP requests.
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0' // Updated OkHttp version
+
+    // Image Loading Library: Glide (already included)
+    // A fast and efficient image loading library for Android.
+    implementation 'com.github.bumptech.glide:glide:4.16.0' // Updated Glide version
+    // Annotation processor for Glide (required for some features)
+    kapt 'com.github.bumptech.glide:compiler:4.16.0' // Updated Glide compiler version
+
+    // Testing dependencies
+    // JUnit - a popular testing framework for Java
+    testImplementation 'junit:junit:4.13.2' // Keep current stable version
+    // AndroidX Test JUnit - JUnit rules and APIs for AndroidX
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5' // Keep current stable version
+    // AndroidX Test Espresso - for writing UI tests
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1' // Keep current stable version
+
+    // Optional: Add other common dependencies here as needed
+    // Example: ViewModel and LiveData (for Architecture Components)
+    // implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0"
+    // implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.7.0"
+
+    // Example: Navigation Component
+    // implementation "androidx.navigation:navigation-fragment-ktx:2.7.5"
+    // implementation "androidx.navigation:navigation-ui-ktx:2.7.5"
+}
