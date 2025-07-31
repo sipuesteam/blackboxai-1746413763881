@@ -1,3 +1,8 @@
+/**
+ * Bookmark and PWA Installation Logic
+ * This script handles the "Add to Home Screen" functionality for the PWA.
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
   const bookmarkButton = document.getElementById('bookmark-button');
   const notification = document.getElementById('bookmark-notification');
@@ -7,68 +12,48 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  // This script relies on `window.deferredPrompt` being captured by `main.js`.
+  // The 'beforeinstallprompt' event listener is now centralized in main.js.
+
   bookmarkButton.addEventListener('click', () => {
-    // Show initial notification
-    showNotification('Page bookmarked!');
-    
-    // Try to add to browser bookmarks
-    addBrowserBookmark();
-    
-    // Try to prompt for PWA installation if available
-    promptAddToHomeScreen();
+    // Check if the PWA installation prompt is available
+    if (window.deferredPrompt) {
+      // Show the installation prompt
+      window.deferredPrompt.prompt();
+
+      // Wait for the user to respond to the prompt
+      window.deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the PWA installation prompt');
+          showNotification('App installed successfully!');
+        } else {
+          console.log('User dismissed the PWA installation prompt');
+        }
+        // The prompt can only be used once, so we clear it.
+        window.deferredPrompt = null;
+        // Optionally hide the button after the prompt is shown to prevent re-triggering
+        // bookmarkButton.style.display = 'none';
+      });
+    } else {
+      // Fallback for browsers that do not support the prompt,
+      // or if the app is already installed.
+      showNotification('To install, use the "Add to Home Screen" option in your browser menu.');
+    }
   });
 
   function showNotification(message) {
     notification.textContent = message;
     notification.classList.remove('opacity-0', 'pointer-events-none');
-    notification.classList.add('opacity-100', 'pointer-events-auto');
+    notification.classList.add('opacity-100');
 
-    // Hide notification after 2 seconds
+    // Hide notification after 3 seconds
     setTimeout(() => {
-      notification.classList.remove('opacity-100', 'pointer-events-auto');
-      notification.classList.add('opacity-0', 'pointer-events-none');
-    }, 2000);
+      notification.classList.remove('opacity-100');
+      notification.classList.add('opacity-0');
+      // Ensure it's not clickable after hiding
+      setTimeout(() => {
+        notification.classList.add('pointer-events-none');
+      }, 500); // Match transition duration
+    }, 3000);
   }
-
-  function addBrowserBookmark() {
-    const title = document.title || 'Current Page';
-    const url = window.location.href;
-
-    // Check if the browser supports the bookmark API
-    if (window.sidebar && window.sidebar.addPanel) { // Firefox
-      window.sidebar.addPanel(title, url, '');
-    } else if (window.external && ('AddFavorite' in window.external)) { // IE
-      window.external.AddFavorite(url, title);
-    } else if (window.chrome && window.chrome.webstore) { // Chrome
-      // Chrome doesn't have a direct API, so we'll show instructions
-      showNotification('Press Ctrl+D to bookmark this page');
-    } else {
-      // For other browsers, show instructions
-      showNotification('Use your browser\'s menu to bookmark this page');
-    }
-  }
-
-  function promptAddToHomeScreen() {
-    // Check if PWA installation is available
-    if (window.deferredPrompt) {
-      window.deferredPrompt.prompt();
-      
-      window.deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          showNotification('App added to home screen!');
-        } else {
-          showNotification('App not added to home screen');
-        }
-        window.deferredPrompt = null;
-      });
-    }
-  }
-
-  // Store the beforeinstallprompt event for later use
-  window.addEventListener('beforeinstallprompt', (e) => {
-    // Prevent the mini-infobar from appearing on mobile
-    e.preventDefault();
-    // Stash the event so it can be triggered later
-    window.deferredPrompt = e;
-  });
 });

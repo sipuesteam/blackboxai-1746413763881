@@ -25,9 +25,21 @@ This document describes the recommended Google Sheet template structure to be us
 - **Reviews**: To store detailed product reviews if needed.
 - **VisitorCounts**: To track visitor counts or other analytics.
 
+## Sheet: Subscriptions
+
+This sheet is automatically created by the script if it does not exist. It is used to store contact information submitted through the subscription form in the PWA.
+
+| Column Name | Description                               | Example Value                  |
+|-------------|-------------------------------------------|--------------------------------|
+| Timestamp   | The date and time the submission occurred.| "2024-07-30T10:00:00.000Z"      |
+| Email       | The email address submitted by the user.  | "subscriber@example.com"       |
+| WhatsApp    | The WhatsApp number submitted by the user.| "+1234567890"                  |
+
+
 ## Notes
 
 - The "Products" sheet must have the first row as the header row with the exact column names as above.
+- The "Subscriptions" sheet is managed automatically by the `doPost` function in the script.
 - Data rows start from the second row.
 - URLs should be publicly accessible for images and videos.
 - The Apps Script code reads from the "Products" sheet to serve product data as JSON.
