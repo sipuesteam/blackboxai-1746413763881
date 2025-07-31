@@ -1,9 +1,13 @@
 // main.js - Core script for Hygiene & Cleaning Products Store
 
-// IMPORTANT: Replace with your actual Google Apps Script URL for product data
-const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwyKPTF5RwKNUzroHZZV1uRjuHqFPThBxAADwDGhRmWYhoJLZd49gfYOsAstX0sHHKW2Q/exec';
-// IMPORTANT: Replace with your Amazon Associates affiliate tag
-const AMAZON_AFFILIATE_TAG = 'your-actual-affiliate-tag-20';
+// --- CONFIGURATION ---
+// IMPORTANT: Replace these placeholder values with your actual data
+const GOOGLE_APPS_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_JSON_FEED_URL_HERE';
+const AMAZON_AFFILIATE_TAG = 'your-amazon-affiliate-tag-20';
+const AMAZON_PAY_MERCHANT_ID = 'YOUR_AMAZON_PAY_MERCHANT_ID';
+const AMAZON_PAY_PUBLIC_KEY_ID = 'YOUR_AMAZON_PAY_PUBLIC_KEY_ID';
+// This should be a real, embeddable YouTube Video ID
+const PLACEHOLDER_YOUTUBE_VIDEO_ID = 'dQw4w9WgXcQ';
 
 let videoPlaying = false; // Global flag to prevent multiple video popups
 
@@ -106,147 +110,9 @@ function createProductCard(product) {
   img.src = product['Image URL'];
   img.alt = product['Product Name'];
   img.loading = 'lazy'; // Defer loading of images until they are in the viewport
-  img.className = 'w-full h-40 object-cover mb-4 rounded-xl shadow transition-transform duration-300 ease-in-out cursor-pointer z-10 relative';
-  img.style.zIndex = '10'; // Lower default z-index
-
-  // --- Image Zoom/Hover Effect ---
-  // This function attempts to create a zoom and mouse-following effect on image hover.
-  // It involves complex positioning and might have edge cases.
-  // A simpler hover scale effect via CSS might be sufficient depending on requirements.
-  function zoomIn() {
-    const cardElement = img.closest('.product-card');
-    if (!cardElement) {
-        // If not inside a card, apply basic zoom
-        img.style.transition = 'transform 0.4s ease, box-shadow 0.4s ease';
-        img.style.transform = 'scale(1.6)';
-    } else {
-      // More complex zoom within card boundaries
-      const cardRect = cardElement.getBoundingClientRect();
-      const imgRect = img.getBoundingClientRect();
-      const zoomScale = 1.6;
-      const zoomedHeight = imgRect.height * zoomScale;
-      const zoomedWidth = imgRect.width * zoomScale;
-
-
-      // Calculate offset to align image top with card top
-      let topOffset = cardRect.top - imgRect.top;
-       // Calculate offset to align image left with card left
-      let leftOffset = cardRect.left - imgRect.left;
-
-      // Ensure the zoomed image stays within the card's viewport area
-      // This logic might need further refinement depending on exact layout and desired behavior
-      const maxTopOffset = cardRect.height - zoomedHeight;
-      if (topOffset > maxTopOffset && maxTopOffset >= 0) topOffset = maxTopOffset;
-      if (topOffset < 0) topOffset = 0; // Don't move above the card top
-
-      const maxLeftOffset = cardRect.width - zoomedWidth;
-      if (leftOffset > maxLeftOffset && maxLeftOffset >=0) leftOffset = maxLeftOffset;
-       if (leftOffset < 0) leftOffset = 0; // Don't move left of the card left
-
-
-      img.style.transition = 'top 0.4s ease, left 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease';
-      img.style.top = `${topOffset}px`;
-      img.style.left = `${leftOffset}px`; // Apply left offset
-
-
-      // Add mousemove event to move zoomed image with mouse
-      function onMouseMove(e) {
-        const currentImgRect = img.getBoundingClientRect(); // Get updated position
-         // Calculate movement relative to the zoomed image's top-left corner
-        const offsetX = e.clientX - currentImgRect.left;
-        const offsetY = e.clientY - currentImgRect.top;
-
-         // Calculate percentage movement within the zoomed image
-        const percentX = offsetX / currentImgRect.width; // 0 to 1
-        const percentY = offsetY / currentImgRect.height; // 0 to 1
-
-         // Determine max translation based on zoomed size exceeding card size
-         const maxTranslateX = Math.max(0, zoomedWidth - cardRect.width) / 2;
-         const maxTranslateY = Math.max(0, zoomedHeight - cardRect.height) / 2;
-
-         // Calculate translation needed to keep mouse point centered
-         // Range from -maxTranslate to +maxTranslate
-         const moveX = (0.5 - percentX) * 2 * maxTranslateX;
-         const moveY = (0.5 - percentY) * 2 * maxTranslateY;
-
-
-        // Apply scale and translation relative to the image's own origin (default is center)
-        // If origin was top-left, calculation would differ.
-        // Let's refine this to apply translation relative to the mouse position within the scaled image
-         // A common technique is to adjust background-position if using background image,
-         // or calculate translation based on mouse position relative to the scaled image bounds.
-
-        // Let's use a simpler approach: move the image container based on mouse position
-        // within the *original* card bounds.
-
-         // Re-calculating mouse position relative to the *card*
-         const mouseX_relative_to_card = e.clientX - cardRect.left;
-         const mouseY_relative_to_card = e.clientY - cardRect.top;
-
-         const cardPercentX = mouseX_relative_to_card / cardRect.width; // 0 to 1 within card
-         const cardPercentY = mouseY_relative_to_card / cardRect.height; // 0 to 1 within card
-
-         // Determine maximum translation within the boundaries
-         const boundsX = zoomedWidth - cardRect.width; // How much the zoomed image exceeds card width
-         const boundsY = zoomedHeight - cardRect.height; // How much the zoomed image exceeds card height
-
-         // Calculate translation - move from center (0.5) towards the direction the mouse is in
-         const translateX = boundsX > 0 ? (0.5 - cardPercentX) * boundsX : 0;
-         const translateY = boundsY > 0 ? (0.5 - cardPercentY) * boundsY : 0;
-
-         // Apply scale and translation
-         img.style.transform = `scale(1.6) translate(${translateX}px, ${translateY}px)`;
-
-      }
-      img.addEventListener('mousemove', onMouseMove);
-
-      // Add smooth transition for transform on mousemove
-      img.style.transition = 'top 0.4s ease, left 0.4s ease, transform 0.1s ease, box-shadow 0.4s ease'; // Faster transform transition
-
-      // Store the handler to remove later
-      img._onMouseMove = onMouseMove;
-    }
-
-     // Apply styles that change on zoom
-    img.style.zIndex = '9999'; // Set very high z-index to show over all items
-    img.style.position = 'absolute'; // Change position context
-    img.style.boxShadow = '0 10px 20px rgba(0,0,0,0.3)';
-    img.style.borderRadius = '1rem'; // Slightly larger border radius when zoomed
-    img.style.cursor = 'zoom-out'; // Change cursor to indicate it can zoom out
-  }
-
-  function zoomOut() {
-    img.style.transform = 'scale(1) translate(0, 0)'; // Reset scale and translation
-    img.style.zIndex = '10'; // Reset z-index
-    img.style.position = 'relative'; // Reset position context
-    img.style.top = 'auto'; // Reset position
-    img.style.left = 'auto'; // Reset position
-    img.style.boxShadow = 'none'; // Remove shadow
-    img.style.borderRadius = '0.75rem'; // Reset border radius
-    img.style.transition = 'transform 0.4s ease, box-shadow 0.4s ease, top 0.4s ease, left 0.4s ease'; // Smooth transition back
-    img.style.cursor = 'zoom-in'; // Reset cursor
-
-    // Remove mousemove event listener
-    if (img._onMouseMove) {
-      img.removeEventListener('mousemove', img._onMouseMove);
-      delete img._onMouseMove;
-    }
-  }
-
-  // Use click for zoom toggle might be better for touch devices
-  // img.addEventListener('click', () => {
-  //   if (img.style.transform === 'scale(1.6) translate(0px, 0px)' || img._isZoomed) { // Check if already zoomed
-  //      zoomOut();
-  //   } else {
-  //      zoomIn();
-  //   }
-  //   img._isZoomed = !img._isZoomed; // Toggle state
-  // });
-
-   // Revert to original hover behavior as in the provided code
-   img.addEventListener('mouseenter', zoomIn);
-   img.addEventListener('mouseleave', zoomOut);
-  // --- End Image Zoom/Hover Effect ---
+  img.className = 'w-full h-40 object-cover mb-4 rounded-xl shadow transition-transform duration-300 ease-in-out';
+  // The hover effect is now handled by the parent card's `hover:scale-105` class.
+  // The complex JS zoom logic has been removed for simplicity and reliability.
 
 
   const name = document.createElement('h2');
@@ -474,8 +340,8 @@ async function renderProducts() {
       if (buttonContainer) {
         try {
              amazon.Pay.renderButton(`#${buttonId}`, {
-              merchantId: 'YOUR_MERCHANT_ID', // <-- REPLACE
-              publicKeyId: 'YOUR_PUBLIC_KEY_ID', // <-- REPLACE
+              merchantId: AMAZON_PAY_MERCHANT_ID,
+              publicKeyId: AMAZON_PAY_PUBLIC_KEY_ID,
               ledgerCurrency: 'USD',
               checkoutLanguage: 'en_US',
               productType: 'PayAndShip', // Or 'Checkout' depending on your flow
@@ -532,10 +398,9 @@ function openDescriptionPopup(product) {
   videoWrapper.className = 'aspect-w-16 aspect-h-9 mb-4 w-full max-w-full'; // Ensure wrapper is responsive
 
   const iframe = document.createElement('iframe');
-  // IMPORTANT: Replace with the actual YouTube embed URL or other video source
-  // Example YouTube embed URL format: https://www.youtube.com/embed/VIDEO_ID
-  // The 'enablejsapi=1' parameter is needed for the YouTube API events
-  iframe.src = `https://www.youtube.com/embed/YOUR_VIDEO_ID?enablejsapi=1`; // <-- REPLACE 'YOUR_VIDEO_ID'
+  // Use the placeholder video ID from the configuration section
+  const videoUrl = product['Video URL'] || `https://www.youtube.com/embed/${PLACEHOLDER_YOUTUBE_VIDEO_ID}?enablejsapi=1`;
+  iframe.src = videoUrl;
   iframe.title = `Promotional Video for ${product['Product Name']}`;
   iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
   iframe.allowFullscreen = true; // Allow fullscreen
@@ -936,16 +801,22 @@ function rotateAds(adElementId, adTexts, displayTimes) {
         console.error(`Ad element not found: #${adElementId}`);
         return;
     }
+    // Ensure the arrays have the same length to avoid out-of-bounds errors
+    if (adTexts.length !== displayTimes.length) {
+        console.warn(`Ad texts and display times arrays have different lengths for #${adElementId}. Rotation aborted.`);
+        return;
+    }
 
     let adIndex = 0;
-    let displayIndex = 0;
 
     function updateAd() {
-        adElement.textContent = adTexts[adIndex];
-        const currentDisplayTime = displayTimes[displayIndex];
+        if (adTexts.length === 0) return; // Don't run if there are no ads
 
+        adElement.textContent = adTexts[adIndex];
+        const currentDisplayTime = displayTimes[adIndex];
+
+        // Increment index and loop back to 0 if it reaches the end
         adIndex = (adIndex + 1) % adTexts.length;
-        displayIndex = (displayIndex + 1) % displayTimes.length;
 
         // Use setTimeout to schedule the next update
         setTimeout(updateAd, currentDisplayTime);
@@ -1156,40 +1027,42 @@ window.addEventListener('load', () => {
          `;
          document.head.appendChild(style);
      }
-
-+  // Bookmark button click event and notification popup logic
-+  const bookmarkButton = document.getElementById('bookmark-button');
-+  const bookmarkNotification = document.getElementById('bookmark-notification');
 +
-+  if (bookmarkButton && bookmarkNotification) {
-+    bookmarkButton.addEventListener('click', () => {
-+      if (deferredPrompt) {
-+        deferredPrompt.prompt();
-+        deferredPrompt.userChoice.then((choiceResult) => {
-+          if (choiceResult.outcome === 'accepted') {
-+            console.log('User accepted the A2HS prompt');
-+            bookmarkNotification.classList.remove('opacity-0', 'pointer-events-none');
-+            bookmarkNotification.classList.add('opacity-100');
-+            setTimeout(() => {
-+              bookmarkNotification.classList.remove('opacity-100');
-+              bookmarkNotification.classList.add('opacity-0');
-+              setTimeout(() => {
-+                bookmarkNotification.classList.add('pointer-events-none');
-+              }, 500);
-+            }, 2000);
-+          } else {
-+            console.log('User dismissed the A2HS prompt');
-+          }
-+          deferredPrompt = null;
++    // Bookmark button click event and notification popup logic
++    const bookmarkButton = document.getElementById('bookmark-button');
++    const bookmarkNotification = document.getElementById('bookmark-notification');
++
++    if (bookmarkButton && bookmarkNotification) {
++        bookmarkButton.addEventListener('click', () => {
++            if (deferredPrompt) {
++                deferredPrompt.prompt();
++                deferredPrompt.userChoice.then((choiceResult) => {
++                    if (choiceResult.outcome === 'accepted') {
++                        console.log('User accepted the A2HS prompt');
++                        bookmarkNotification.classList.remove('opacity-0', 'pointer-events-none');
++                        bookmarkNotification.classList.add('opacity-100');
++                        setTimeout(() => {
++                            bookmarkNotification.classList.remove('opacity-100');
++                            bookmarkNotification.classList.add('opacity-0');
++                            setTimeout(() => {
++                                bookmarkNotification.classList.add('pointer-events-none');
++                            }, 500);
++                        }, 2000);
++                    } else {
++                        console.log('User dismissed the A2HS prompt');
++                    }
++                    deferredPrompt = null;
++                });
++            } else {
++                // Fallback for browsers that do not support PWA installation prompt
++                // or if the app is already installed.
++                alert('To add this page to your home screen, use the "Add to Home Screen" option in your browser menu.');
++            }
 +        });
-+      } else {
-+        alert('Add to Home Screen is not available or already installed.');
-+      }
-+    });
-+  } else {
-+    console.error('Bookmark button or notification element not found.');
-+  }
-});
++    } else {
++        console.error('Bookmark button or notification element not found.');
++    }
++});
 
 // Note: The `startAutoScroll` function was mentioned but not provided in the code block.
 // If you need the product slider to auto-scroll, you'll need to define that function.
